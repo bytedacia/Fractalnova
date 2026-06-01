@@ -1,0 +1,7 @@
+{
+  "enabled": true,
+  "webhook_url": "",
+  "email_enabled": false,
+  "min_severity": "MEDIUM",
+  "rate_limit_alerts_per_hour": 10
+}

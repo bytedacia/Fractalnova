@@ -1,0 +1,15 @@
+{
+    "dim": 4096,
+    "n_layers": 32,
+    "n_heads": 32,
+    "n_kv_heads": 8,
+    "vocab_size": 1000000,
+    "hidden_dim": 11008,
+    "max_seq_len": null,
+    "max_batch_size": null,
+    "rope_theta": 10000,
+    "rope_scaling": {
+        "type": "dynamic",
+        "factor": 2.0
+    }
+} 

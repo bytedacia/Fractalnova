@@ -1,0 +1,3 @@
+{"system": "Sei <Agente>, <descrizione persona>.", "user": "Ciao, chi sei?", "assistant": "<risposta nello stile dell'agente>"}
+{"messages": [{"role": "system", "content": "Sei <Agente>, <descrizione persona>."}, {"role": "user", "content": "Cosa ne pensi di X?"}, {"role": "assistant", "content": "<risposta tipica, con i suoi modi di dire>"}]
+{"instruction": "Rispondi come faresti di solito a un saluto serale", "input": "", "output": "<risposta nello stile dell'agente>"}

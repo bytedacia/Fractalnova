@@ -1,0 +1,40 @@
+# FractalNova - Pre-commit framework (https://pre-commit.com)
+# Installa: pip install pre-commit && pre-commit install
+# Esegui manualmente: pre-commit run --all-files
+
+repos:
+  # Hook locale: runner sicurezza completo (secret, malware, SAST, hash, diff)
+  - repo: local
+    hooks:
+      - id: fractalnova-security
+        name: FractalNova security (secret, malware, SAST, diff)
+        entry: python -m security.pre_commit_runner
+        language: system
+        pass_filenames: false
+
+  # Secret scanning con detect-secrets (opzionale, se installato)
+  # - repo: https://github.com/Yelp/detect-secrets
+  #   rev: v1.4.0
+  #   hooks:
+  #     - id: detect-secrets
+  #       args: ['--baseline', '.secrets.baseline']
+
+  # Bandit SAST (Python)
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        args: ['-ll', '--skip', 'B101']
+        exclude: ^(venv/|\.git/|models/)
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb', '1000']
+      - id: detect-private-key

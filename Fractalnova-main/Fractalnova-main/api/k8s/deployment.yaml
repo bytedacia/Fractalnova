@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fractalnova-api
+  labels: { app: fractalnova-api }
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: fractalnova-api }
+  template:
+    metadata:
+      labels: { app: fractalnova-api }
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/bytedacia/fractalnova-api:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: fractalnova-secrets, key: database-url } }
+            - name: API_JWT_SECRET
+              valueFrom: { secretKeyRef: { name: fractalnova-secrets, key: jwt-secret } }
+            - name: API_RATE_LIMIT_PER_MIN
+              value: "120"
+          resources:
+            requests: { cpu: "250m", memory: "256Mi" }
+            limits: { cpu: "1", memory: "512Mi" }
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 15
+            periodSeconds: 20

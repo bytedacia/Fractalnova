@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fractalnova-vllm
+  labels: { app: fractalnova-vllm }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: fractalnova-vllm }
+  template:
+    metadata:
+      labels: { app: fractalnova-vllm }
+    spec:
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          args:
+            - "--model"
+            - "/models/fractalnova-pro-merged"
+            - "--served-model-name"
+            - "fractalnova-pro"
+            - "--port"
+            - "8001"
+            - "--max-model-len"
+            - "32768"
+            - "--gpu-memory-utilization"
+            - "0.90"
+          ports:
+            - containerPort: 8001
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+              memory: "24Gi"
+          volumeMounts:
+            - { name: models, mountPath: /models }
+      volumes:
+        - name: models
+          persistentVolumeClaim: { claimName: fractalnova-models }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fractalnova-vllm
+spec:
+  selector: { app: fractalnova-vllm }
+  ports:
+    - { name: http, port: 8001, targetPort: 8001 }

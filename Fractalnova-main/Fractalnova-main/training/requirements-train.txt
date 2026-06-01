@@ -1,0 +1,49 @@
+# === FractalNova · dipendenze per il TRAINING (QLoRA + DPO + HPARAM) ===
+#
+# IMPORTANTE — RTX 5060 Ti = architettura Blackwell (sm_120):
+#   PyTorch va installato A PARTE con CUDA 12.8, NON da questo file.
+#   Consigliato: WSL2 (Ubuntu) per bitsandbytes.
+#
+#   1) PyTorch (cu128):
+#      pip install --index-url https://download.pytorch.org/whl/cu128 torch torchvision torchaudio
+#
+#   2) Verifica GPU:
+#      python -c "import torch; print(torch.cuda.get_device_name(0), 'CUDA', torch.version.cuda, 'bf16', torch.cuda.is_bf16_supported())"
+#
+#   3) Queste dipendenze:
+#      pip install -r training/requirements-train.txt
+#
+#   4) Gemelli per dataset generation:
+#      pip install google-generativeai tqdm
+#
+#   5) (Opzionale) Benchmark contro GPT-4 / Claude:
+#      pip install openai anthropic
+
+# === Core training ===
+transformers>=4.46,<5
+trl>=0.12,<0.14
+peft>=0.13
+bitsandbytes>=0.45
+datasets>=3.0
+accelerate>=1.0
+sentencepiece>=0.2.0
+protobuf>=4.25
+pyyaml>=6.0
+tqdm>=4.66
+
+# === Pretraining da zero (FractalNova-Core) ===
+numpy>=1.26
+tokenizers>=0.20
+
+# === Hyperparameter tuning ===
+optuna>=4.0
+
+# === Dataset generation ===
+# google-generativeai >= 0.8  (install separately)
+
+# === Benchmark ===
+# openai >= 1.0      (GPT-4 comparison)
+# anthropic >= 0.30  (Claude comparison)
+
+# === Continuous training ===
+# psycopg2-binary >= 2.9  (if using Postgres for feedback collection)

@@ -1,0 +1,34 @@
+# =========================================================================
+# FractalNova · DPO Alignment Config · Qwen3-4B · RTX 5060 Ti (16 GB)
+# =========================================================================
+
+base_model: "Qwen/Qwen3-4B"
+dpo_data: "training/data/dpo_pairs.jsonl"
+output_dir: "training/outputs/fractalnova-dpo"
+
+# LoRA per DPO (rank medio: equilibrio tra capacity e regolarizzazione)
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+# DPO hyperparameters
+beta: 0.1
+max_length: 8192
+max_prompt_length: 4096
+
+# Training (4B = batch più grande a parità di VRAM)
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 5e-6
+num_train_epochs: 1
+warmup_steps: 50
+logging_steps: 10
+save_steps: 200
+save_total_limit: 2
+
+# Optimization
+bf16: true
+gradient_checkpointing: true
+optim: "paged_adamw_8bit"
+seed: 42

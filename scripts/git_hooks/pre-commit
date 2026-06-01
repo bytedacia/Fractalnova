@@ -1,0 +1,26 @@
+#!/bin/bash
+# FractalNova - Pre-commit hook: secret scan, malware patterns, SAST, dependency, hash, diff
+# Installa: cp scripts/git_hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "🔍 FractalNova - Security scan in corso..."
+
+if command -v python &>/dev/null; then
+  if python -m security.pre_commit_runner --root "$ROOT"; then
+    echo "✅ Security check superato"
+    exit 0
+  else
+    echo "❌ Security check FALLITO. Commit bloccato."
+    exit 1
+  fi
+fi
+
+# Fallback: Bandit se security module non disponibile
+if command -v bandit &>/dev/null; then
+  bandit -r . -ll -q --exclude ./venv --exclude ./.git || exit 1
+fi
+echo "✅ Pre-commit completato"
+exit 0

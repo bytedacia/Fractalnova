@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fractalnova"
+version = "0.1.0"
+description = "FractalNova — sistema multilingua per generare, rifinire e pubblicare libri con IA (modello proprietario Core da zero + fine-tune Pro)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "LICENSE-CODE / LICENSE-MODEL" }
+authors = [{ name = "FractalNova" }]
+keywords = ["llm", "book-generation", "qlora", "multilingual", "fine-tuning", "pretraining"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "torch>=2.0.0",
+  "transformers>=4.46",
+  "gradio>=4.0.0",
+  "python-dotenv>=0.19.0",
+  "google-generativeai>=0.3.0",
+  "google-api-python-client>=2.0.0",
+  "python-docx>=0.8.11",
+  "Pillow>=9.0.0",
+  "requests>=2.26.0",
+  "beautifulsoup4>=4.9.3",
+  "safetensors>=0.3.1",
+  "huggingface_hub>=0.24.0",
+  "diffusers>=0.30.0",
+  "accelerate>=0.33.0",
+  "flask>=3.0.0",
+  "flask-cors>=4.0.0",
+]
+
+[project.optional-dependencies]
+train = [
+  "trl>=0.12,<0.14",
+  "peft>=0.13",
+  "bitsandbytes>=0.45",
+  "datasets>=3.0",
+  "sentencepiece>=0.2.0",
+  "pyyaml>=6.0",
+  "numpy>=1.26",
+  "tokenizers>=0.20",
+  "tqdm>=4.66",
+]
+dev = ["pytest>=8.0", "ruff>=0.6", "black>=24.0"]
+
+[project.scripts]
+fractalnova = "fractalnova_cli:main"
+
+[tool.setuptools]
+py-modules = ["fractalnova_cli"]
+
+[tool.setuptools.packages.find]
+include = ["inference*", "training*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]

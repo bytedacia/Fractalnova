@@ -1,0 +1,9 @@
+.env
+models/
+books/
+generated_books/
+wattpad_exports/
+book_covers/
+__pycache__/
+*.zlib
+*.docx
