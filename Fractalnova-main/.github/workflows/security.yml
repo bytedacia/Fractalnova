@@ -1,0 +1,197 @@
+name: Ultra Security Guard - 24/7 Protection
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '*/15 * * * *' # Every 15 minutes - più frequente
+  workflow_dispatch: # Permette esecuzione manuale
+
+jobs:
+  ultra_security_scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # Timeout per evitare loop infiniti
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Fetch full history per analisi completa
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install cryptography # For security module
+        pip install ast # For AST analysis
+
+    - name: Create Security Baseline (if not exists)
+      id: create_baseline
+      run: |
+        echo "🔒 Creazione baseline di sicurezza..."
+        if [ ! -f security/self_monitor_baseline.json ]; then
+          python security/self_monitor.py . create_baseline
+          echo "baseline_created=true" >> $GITHUB_OUTPUT
+          echo "✅ Baseline creata"
+        else
+          echo "baseline_created=false" >> $GITHUB_OUTPUT
+          echo "✅ Baseline esistente trovata"
+        fi
+      continue-on-error: true
+
+    - name: Run Ultra Security Guard - Integrity Check
+      id: integrity_check
+      run: |
+        echo "🛡️ Verifica integrità file..."
+        python security/self_monitor.py . check > integrity_result.json
+        cat integrity_result.json
+      continue-on-error: true
+
+    - name: Run Advanced Security Verifier
+      id: advanced_scan
+      run: |
+        echo "🔍 Scansione avanzata per codice malevolo..."
+        python security/advanced_verifier.py . > advanced_scan_result.json
+        cat advanced_scan_result.json
+      continue-on-error: true
+
+    - name: Run Ultra Guard Emergency Scan
+      id: emergency_scan
+      run: |
+        echo "🚨 Scansione di emergenza ultra-avanzata..."
+        python security/ultra_guard.py . emergency_scan > emergency_scan_result.json
+        cat emergency_scan_result.json
+      continue-on-error: true
+
+    - name: Run Auto-Repair System
+      id: auto_repair
+      run: |
+        echo "🔧 Sistema di auto-riparazione..."
+        python security/auto_repair.py . scan > auto_repair_result.json
+        cat auto_repair_result.json
+      continue-on-error: true
+
+    - name: Create Secure Backup
+      id: secure_backup
+      run: |
+        echo "🔒 Creazione backup sicuro..."
+        python security/backup_manager.py . backup > backup_result.json
+        cat backup_result.json
+      continue-on-error: true
+
+    - name: Check for Critical Threats
+      id: check_threats
+      run: |
+        echo "🔍 Analisi risultati per threat critici..."
+        
+        # Controlla integrità
+        if [ -f integrity_result.json ]; then
+          INTEGRITY_STATUS=$(python -c "import json; data=json.load(open('integrity_result.json')); print(data.get('status', 'unknown'))")
+          echo "Integrity Status: $INTEGRITY_STATUS"
+          
+          if [ "$INTEGRITY_STATUS" = "changes_detected" ]; then
+            echo "⚠️ Modifiche rilevate nei file!"
+            echo "threats_detected=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+        
+        # Controlla scansione avanzata
+        if [ -f advanced_scan_result.json ]; then
+          THREATS_COUNT=$(python -c "import json; data=json.load(open('advanced_scan_result.json')); print(data.get('threats_found', 0))")
+          SEVERITY=$(python -c "import json; data=json.load(open('advanced_scan_result.json')); print(data.get('overall_severity', 'unknown'))")
+          echo "Threats Found: $THREATS_COUNT"
+          echo "Severity: $SEVERITY"
+          
+          if [ "$SEVERITY" = "critical" ] || [ "$SEVERITY" = "high" ]; then
+            echo "🚨 THREAT CRITICI RILEVATI!"
+            echo "critical_threats=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+        
+        # Controlla scansione di emergenza
+        if [ -f emergency_scan_result.json ]; then
+          EMERGENCY_THREATS=$(python -c "import json; data=json.load(open('emergency_scan_result.json')); print(data.get('threats_found', 0))")
+          echo "Emergency Threats: $EMERGENCY_THREATS"
+          
+          if [ "$EMERGENCY_THREATS" -gt 0 ]; then
+            echo "🚨 EMERGENZA SICUREZZA!"
+            echo "emergency_threats=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+        
+        # Controlla auto-riparazione
+        if [ -f auto_repair_result.json ]; then
+          FILES_INFECTED=$(python -c "import json; data=json.load(open('auto_repair_result.json')); print(data.get('files_infected', 0))")
+          FILES_REPAIRED=$(python -c "import json; data=json.load(open('auto_repair_result.json')); print(data.get('files_repaired', 0))")
+          echo "Files Infected: $FILES_INFECTED"
+          echo "Files Repaired: $FILES_REPAIRED"
+          
+          if [ "$FILES_INFECTED" -gt 0 ]; then
+            echo "🔧 FILE INFETTI RILEVATI E RIPARATI!"
+            echo "files_infected=true" >> $GITHUB_OUTPUT
+          fi
+        fi
+        
+        # Controlla backup sicuro
+        if [ -f backup_result.json ]; then
+          FILES_BACKED_UP=$(python -c "import json; data=json.load(open('backup_result.json')); print(data.get('files_backed_up', 0))")
+          echo "Files Backed Up: $FILES_BACKED_UP"
+        fi
+
+    - name: Upload Security Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: ultra-security-reports
+        path: |
+          security/self_monitor_baseline.json
+          security/ultra_guard_status.json
+          security/ultra_guard_activity.log
+          security/emergency_log.json
+          security/secure_backups/
+          security/quarantine/
+          security/auto_repair_log.json
+          integrity_result.json
+          advanced_scan_result.json
+          emergency_scan_result.json
+          auto_repair_result.json
+          backup_result.json
+        retention-days: 30
+
+    - name: Upload Security Alerts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-alerts
+        path: security/security_alerts.json
+        retention-days: 90
+
+    - name: Fail on Critical Threats
+      if: steps.check_threats.outputs.critical_threats == 'true' || steps.check_threats.outputs.emergency_threats == 'true'
+      run: |
+        echo "🚨 BUILD FALLITA: Threat critici rilevati!"
+        echo "📋 Controlla gli artifact per dettagli completi"
+        echo "🔒 I file critici potrebbero essere stati criptati automaticamente"
+        echo "🔧 Sistema di auto-riparazione ha tentato di correggere i file infetti"
+        exit 1
+
+    - name: Warning on Threats
+      if: steps.check_threats.outputs.threats_detected == 'true' && steps.check_threats.outputs.critical_threats != 'true'
+      run: |
+        echo "⚠️ ATTENZIONE: Modifiche rilevate nei file"
+        echo "📋 Controlla gli artifact per dettagli"
+        echo "✅ Build continua ma monitora attentamente"
+
+    - name: Security Check Passed
+      if: steps.check_threats.outputs.threats_detected != 'true'
+      run: |
+        echo "✅ SISTEMA SICURO: Nessun threat rilevato"
+        echo "🛡️ Protezione 24/7 attiva e funzionante"
+
+

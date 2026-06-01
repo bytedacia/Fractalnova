@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dev tools (leggero, senza stack ML pesante)
+        run: pip install pytest ruff
+
+      - name: Ruff (lint del codice di produzione)
+        run: ruff check fractalnova tests fractalnova_cli.py
+
+      - name: Pytest (i test che richiedono torch si auto-saltano)
+        run: pytest

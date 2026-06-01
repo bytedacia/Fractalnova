@@ -1,0 +1,37 @@
+# =========================================================================
+# FractalNova-Core · config DEMO (training reale, veloce, su 1 GPU)
+# Modello piccolo + corpus ridotto: serve a DIMOSTRARE che il loop di
+# pretraining da zero gira sulla GPU e la loss scende. Per qualità reale
+# usa fractalnova_core_124m.yaml con un corpus grande.
+# =========================================================================
+data_dir: "training/pretrain/artifacts"
+
+# --- Architettura (piccola, ~3-5M parametri) ---
+n_layer: 4
+n_head: 4
+n_embd: 256
+block_size: 64
+dropout: 0.0
+bias: false
+rope_theta: 10000.0
+
+# --- Training (breve, per demo) ---
+out_dir: "training/pretrain/outputs/core-demo"
+init_from: "scratch"
+batch_size: 8
+gradient_accumulation_steps: 2
+max_iters: 300
+warmup_iters: 20
+lr_decay_iters: 300
+learning_rate: 0.0006
+min_lr: 0.00006
+weight_decay: 0.1
+beta1: 0.9
+beta2: 0.95
+grad_clip: 1.0
+eval_interval: 50
+eval_iters: 20
+log_interval: 10
+compile: false
+dtype: "bfloat16"
+seed: 1337

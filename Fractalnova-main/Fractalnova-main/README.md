@@ -36,17 +36,21 @@ dalla scrittura del manoscritto ai file pronti per la pubblicazione (EPUB/PDF/Wo
 
 ---
 
-## 🧠 I modelli (strategia a due tracce)
+## 🧠 I modelli (strategia a tre tracce)
 
 | | Tipo | Parametri | Multilingua "umano" | Ruolo | Licenza |
 |---|---|---|---|---|---|
-| **FractalNova-Pro** | Modello proprietario **da zero** | **~321B** | ✅ ~29 lingue | Motore di produzione | **Proprietario — non distribuibile** |
+| **FractalNova-Pro** | Modello proprietario **da zero** | **~321B** | ✅ ~29 lingue | Motore di punta | **Proprietario — non distribuibile** |
+| **FractalNova-Base** | Modello proprietario **da zero** | **~25B** | ✅ ~29 lingue | Motore di produzione | **Proprietario — non distribuibile** |
 | **FractalNova-Core** | Pretraining **da zero** | ~124M | ⚠️ 1–2 lingue | Nucleo proprietario / ricerca | **Proprietario** |
 
-> ⚠️ **FractalNova-Pro è un modello proprietario.** I pesi, l'architettura e il codice di addestramento
-> non sono distribuiti pubblicamente. L'accesso a FractalNova-Pro è soggetto a licenza proprietaria
+> ⚠️ **Tutti i modelli FractalNova sono proprietari.** I pesi, l'architettura e il codice di addestramento
+> non sono distribuiti pubblicamente. L'accesso ai modelli FractalNova è soggetto a licenza proprietaria
 > (vedi [`LICENSE-MODEL`](LICENSE-MODEL)). Nessuna autorizzazione è concessa per la copia, la modifica,
 > la distribuzione o la creazione di opere derivate.
+>
+> **FractalNova-Base (25B)** è la versione prioritaria per la produzione: bilancia potenza e
+> efficienza, ed è il modello di default per l'inferenza locale.
 
 Dettagli, comandi e note hardware: [`training/README.md`](training/README.md) · scheda: [`MODEL_CARD.md`](MODEL_CARD.md).
 
@@ -55,8 +59,9 @@ Dettagli, comandi e note hardware: [`training/README.md`](training/README.md) ·
 ```python
 from inference.fractalnova import FractalNovaInference
 
-ai = FractalNovaInference("pro")   # FractalNova-Pro 321B — modello proprietario (no pesi pubblici)
-ai = FractalNovaInference("core")  # 124M da zero (IP proprietario)
+ai = FractalNovaInference("pro")    # FractalNova-Pro 321B — modello proprietario (no pesi pubblici)
+ai = FractalNovaInference("base")   # FractalNova-Base 25B — modello proprietario (default produzione)
+ai = FractalNovaInference("core")   # 124M da zero (IP proprietario)
 
 ai.generate("Scrivi un racconto...")                       # testo
 ai.humanize(testo)                                          # umanizzazione
@@ -73,14 +78,14 @@ ai.run({"title":"...", "genre":"..."})                      # pipeline
 
 | Modulo | Descrizione | Modello |
 |---|---|---|
-| Testo / Chat | generazione, stile, SEO, traduzione | **FractalNova-Pro 321B** (proprietario) |
+| Testo / Chat | generazione, stile, SEO, traduzione | **FractalNova-Base 25B** (default) / **Pro 321B** (premium) |
 | Visione | analisi copertine, SEO visiva, genere | **Gemma-4-E2B** |
 | Copertina | generazione immagini | **FLUX.1-dev** |
 | Addestramento | QLoRA + DPO | `training/` |
 | Frontend | Gradio 4 tab (`app.py`) | testi, stile, libri, copertine |
 | Export | EPUB, DOCX, PDF, Wattpad, KDP | `fractalnova/export.py` |
 
-> **Onestà:** FractalNova-Pro (321B) è un modello **proprietario** non distribuito pubblicamente.
+> **Onestà:** FractalNova-Base (25B) e FractalNova-Pro (321B) sono modelli **proprietari** non distribuiti pubblicamente.
 > L'intera pipeline è progettata per funzionare in locale con i modelli proprietari FractalNova,
 > senza dipendere da API esterne. FractalNova "compete" per **specializzazione** sul dominio libri.
 
@@ -152,11 +157,11 @@ Tabella estesa GPU/CPU/RAM: vedi sezione hardware in fondo a questo file nella s
 ## 📄 Licenza
 - **Codice**: [`LICENSE-CODE`](LICENSE-CODE) — licenza open source.
 - **Modelli / Pesi**: [`LICENSE-MODEL`](LICENSE-MODEL) — **proprietario, non distribuibile**.
-  FractalNova-Pro (321B) e FractalNova-Core (124M) sono modelli proprietari.
+  FractalNova-Pro (321B), FractalNova-Base (25B) e FractalNova-Core (124M) sono modelli proprietari.
   Nessuna autorizzazione è concessa per la copia, modifica, distribuzione o creazione di opere derivate.
 - Rispettare le licenze dei modelli di terze parti (es. FLUX.1-dev → Black Forest Labs).
 
-> ⚠️ **Attenzione**: i pesi di FractalNova-Pro non sono inclusi in questo repository e non sono
+> ⚠️ **Attenzione**: i pesi dei modelli FractalNova non sono inclusi in questo repository e non sono
 > distribuiti. L'accesso è soggetto a separata licenza proprietaria.
 
 ## 📝 Citazione

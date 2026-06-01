@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fractalnova-api
+  labels: { app: fractalnova-api }
+spec:
+  type: ClusterIP
+  selector: { app: fractalnova-api }
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000

@@ -1,14 +1,16 @@
 # FractalNova · Model Training
 
-Costruisci il **tuo modello di scrittura** partendo da Qwen3-4B (fine-tuning QLoRA)
-oppure da zero con FractalNova-Core (124M). Tutto su **una GPU consumer 16GB**.
+Costruisci i modelli FractalNova: **Base (25B)**, **Pro (321B)** o **Core (124M)** — tutti proprietari, tutti da zero.
 
-## Le due tracce
+## Le tre tracce
 
-| Traccia | Base | Param | Lingue | Addestramento |
-|---|---|---|---|---|
-| **FractalNova-Pro** | Qwen3-4B (fine-tune QLoRA) | ~4B | ~29 | Adapter LoRA in ~8-10 GB VRAM |
-| **FractalNova-Core** | Da zero (tuo IP) | ~124M | 1-2 | Pretraining in <16 GB |
+| Traccia | Tipo | Param | Lingue | Hardware | Ruolo |
+|---|---|---|---|---|---|
+| **FractalNova-Base** | Pretraining da zero | **~25B** | ✅ ~29 | 1× GPU 24GB (RTX 4090/5090) | **Default produzione** |
+| **FractalNova-Pro** | Pretraining da zero | **~321B** | ✅ ~29 | Cluster multi-GPU | Motore di punta |
+| **FractalNova-Core** | Pretraining da zero | ~124M | 1–2 | 1× GPU 16GB (RTX 5060 Ti) | Ricerca / testing |
+
+> ⚠️ **Tutti i modelli sono proprietari.** Nessun peso è distribuito pubblicamente.
 
 ## Setup
 
@@ -17,52 +19,45 @@ pip install --index-url https://download.pytorch.org/whl/cu128 torch torchvision
 pip install -r training/requirements-train.txt
 ```
 
-## Traccia Pro — fine-tuning Qwen3-4B
+## Traccia Base — FractalNova-Base (25B) — DEFAULT
 
 ```bash
-# 1) Genera 10.000+ esempi sintetici (richiede GOOGLE_API_KEY)
-python training/dataset_generator.py --generate-all --num-per-task 500 --languages it,en,es,fr,de
+# 1) Genera 10.000+ esempi sintetici
+python training/dataset_generator.py --generate-all --num-per-task 500 --languages it,en,es,fr,de,pt
 
-# 2) Prepara dataset in formato chat
+# 2) Prepara dataset
 python training/prepare_dataset.py \
     --inputs training/data/generated/all_generated.jsonl \
     --out-dir training/data
 
-# 3) (Opzionale) Hyperparameter tuning con Optuna
-python training/hyperparameter_tuning.py --n-trials 30
+# 3) Pretraining da zero
+python training/pretrain/pretrain.py --config training/pretrain/configs/fractalnova_base_25b.yaml
 
-# 4) Supervised Fine-Tuning (QLoRA)
-python training/train_qlora.py --config training/configs/qlora_5060ti.yaml
+# 4) Fine-tuning su dominio libri
+python training/train_qlora.py --config training/configs/qlora_base_25b.yaml
 
-# 5) Genera preference pairs per DPO
-python training/train_dpo.py --generate-pairs --base-data training/data/train.jsonl --max-pairs 2000
+# 5) DPO Alignment
+python training/train_dpo.py --generate-pairs --base-data training/data/train.jsonl --max-pairs 5000
+python training/train_dpo.py --base-model fractalnova-base-25b \
+    --adapter training/outputs/fractalnova-base-qlora \
+    --output training/outputs/fractalnova-base-dpo
 
-# 6) DPO Alignment
-python training/train_dpo.py --base-model Qwen/Qwen3-4B \
-    --adapter training/outputs/fractalnova-qlora \
-    --output training/outputs/fractalnova-dpo
-
-# 7) Valuta
-python training/evaluate.py --base Qwen/Qwen3-4B \
-    --adapter training/outputs/fractalnova-qlora --load-4bit
-
-# 8) Benchmark contro GPT-4 / Claude / Gemini
-python training/benchmark.py --models gemini-2.0-flash,fractalnova-pro,base-qwen
-
-# 9) Merge per deploy
-python training/merge_and_export.py \
-    --base Qwen/Qwen3-4B \
-    --adapter training/outputs/fractalnova-dpo \
-    --out training/outputs/fractalnova-pro-merged
+# 6) Valuta e benchmark
+python training/evaluate.py --base fractalnova-base-25b --load-4bit
+python training/benchmark.py --models fractalnova-base,fractalnova-pro,fractalnova-core
 ```
 
-Oppure tutto in un colpo solo:
+## Traccia Pro — FractalNova-Pro (321B)
 
 ```bash
-python training/pipeline.py --full-cycle
+# Pretraining da zero (richiede cluster multi-GPU)
+python training/pretrain/pretrain.py --config training/pretrain/configs/fractalnova_pro_321b.yaml
+
+# Fine-tuning + DPO (stessa procedura di Base, parametri più grandi)
+python training/train_fractalnova_pro.py --config training/configs/pro_321b.yaml
 ```
 
-## Traccia Core — pretraining da zero
+## Traccia Core — FractalNova-Core (124M)
 
 ```bash
 python training/pretrain/tokenizer_train.py --input training/data/corpus --out training/pretrain/artifacts
@@ -94,19 +89,25 @@ training/
 ├── train_dpo.py                      # DPO alignment
 ├── hyperparameter_tuning.py          # Optuna
 ├── train_continuous.py               # Continuous training
-├── benchmark.py                      # Benchmark vs GPT-4/Claude/Gemini
+├── train_fractalnova_pro.py          # Training FractalNova-Pro 321B
+├── benchmark.py                      # Benchmark vs modelli
 ├── pipeline.py                       # Orchestratore end-to-end
 ├── evaluate.py / infer.py            # Valutazione e inferenza
 ├── merge_and_export.py               # Merge adapter → modello standalone
 ├── _common.py                        # Loader condiviso
-└── pretrain/                         # Modello da zero (FractalNova-Core)
+└── pretrain/                         # Pretraining da zero
+    ├── configs/
+    │   ├── fractalnova_base_25b.yaml # Config FractalNova-Base (25B)
+    │   ├── fractalnova_pro_321b.yaml # Config FractalNova-Pro (321B)
+    │   └── fractalnova_core_124m.yaml # Config FractalNova-Core (124M)
+    └── ...
 ```
 
 ## Strategia
 
-Qwen3-4B è la scelta ottimale perché:
-- **4B parametri** vs 7B = 43% meno VRAM, inferenza 2x più veloce
-- **Batch size 2** vs 1 (stessa VRAM) = training 2x più rapido
-- **Max_seq_len 2048** vs 1024 = capitoli più coerenti
-- **Costo API** più basso in produzione
-- Abbastanza parametri per specializzarsi sul dominio libri
+FractalNova-Base (25B) è il default perché:
+- **25B parametri** → potenza sufficiente per specializzazione profonda sul dominio libri
+- **~29 lingue** con qualità "umano" nelle principali
+- **Proprietario da zero**: nessuna dipendenza da modelli di terze parti
+- Funziona su **1× GPU 24GB** (RTX 4090 / RTX 5090)
+- **Training efficiente**: pretraining da zero con dati proprietari

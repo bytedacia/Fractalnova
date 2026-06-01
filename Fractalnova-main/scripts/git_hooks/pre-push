@@ -1,0 +1,22 @@
+#!/bin/bash
+# FractalNova - Pre-push hook: scansione completa repo (non solo staged)
+# Installa: cp scripts/git_hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+echo "🔍 FractalNova - Pre-push security scan (full repo)..."
+
+if command -v python &>/dev/null; then
+  if python -m security.pre_commit_runner --root "$ROOT" --pre-push; then
+    echo "✅ Pre-push security check superato"
+    exit 0
+  else
+    echo "❌ Pre-push security check FALLITO. Push bloccato."
+    exit 1
+  fi
+fi
+
+echo "⚠️ Python/security module non disponibile; push consentito."
+exit 0

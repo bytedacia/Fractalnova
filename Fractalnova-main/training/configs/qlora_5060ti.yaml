@@ -1,0 +1,45 @@
+# =========================================================================
+# FractalNova · Config QLoRA per Qwen3-4B · RTX 5060 Ti (16 GB)
+# =========================================================================
+# Qwen3-4B è 45% più piccolo di Qwen2.5-7B -> più spazio per batch/seq_len
+# Permette: batch_size=2, max_seq_len=2048, lora_r=32 nella stessa VRAM
+
+base_model: "models/Qwen3-4B"
+trust_remote_code: false
+
+# --- Dati (prodotti da prepare_dataset.py) ---
+train_file: "training/data/train.jsonl"
+eval_file:  "training/data/val.jsonl"
+max_seq_len: 8192            # libri interi, nessun taglio
+
+# --- Quantizzazione 4-bit (QLoRA) ---
+load_in_4bit: true
+bnb_4bit_quant_type: "nf4"
+bnb_4bit_use_double_quant: true
+bnb_4bit_compute_dtype: "bfloat16"
+
+# --- LoRA (rank più alto: 4B ha meno param, più capacity serve) ---
+lora_r: 32
+lora_alpha: 64
+lora_dropout: 0.05
+lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+# --- Ottimizzazione (batch_size=2 vs 1 per il modello più piccolo) ---
+output_dir: "training/outputs/fractalnova-qlora"
+num_train_epochs: 3
+per_device_train_batch_size: 2        # 7B->4B ci permette batch doppio
+gradient_accumulation_steps: 8        # batch effettivo = 2*8 = 16
+learning_rate: 0.0003                 # 4B può sostenere lr più alta
+lr_scheduler_type: "cosine"
+warmup_ratio: 0.03
+weight_decay: 0.0
+logging_steps: 10
+save_steps: 100
+save_total_limit: 3
+eval_steps: 100
+gradient_checkpointing: true
+optim: "paged_adamw_8bit"
+bf16: true
+seed: 42
+packing: false
+attn_implementation: "sdpa"

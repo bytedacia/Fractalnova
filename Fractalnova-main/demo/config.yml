@@ -1,0 +1,14 @@
+# FractalNova · configurazione demo pubblica (scegliuta)
+tunnel:
+  name: fractalnova-demo
+  hostname: demo.fractalnova.live
+  service: http://127.0.0.1:8080
+port: 8080
+
+# Quick Tunnel (senza DNS, URL temporaneo *.trycloudflare.com):
+#   cloudflared tunnel --url http://127.0.0.1:8080
+#
+# Tunnel nominato (dominio fisso demo.fractalnova.live):
+#   Zero Trust → Tunnels → fractalnova-demo → Public Hostname:
+#     demo.fractalnova.live → http://localhost:8080
+#   cloudflared tunnel run --token %CLOUDFLARE_TUNNEL_TOKEN%

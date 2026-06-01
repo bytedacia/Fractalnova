@@ -1,0 +1,52 @@
+.env
+models/
+books/
+generated_books/
+wattpad_exports/
+book_covers/
+__pycache__/
+*.zlib
+*.docx
+
+# Log/chat export timestamped (non codice)
+2026-*.jsonl
+
+# --- Cloudflare (escludi tunnel/bin/log/URL locali) ---
+demo/bin/
+demo/**/cloudflared.exe
+demo/cloudflare/
+demo/cloudflare_*.ps1
+demo/install_cloudflared.ps1
+demo/.cloudflare.env
+demo/public_url.txt
+demo/LINK_TELEFONO.txt
+demo/cloudflare_url.log*
+demo/running.pids.txt
+demo/running.pids.txt
+
+# --- Artefatti pesanti (non adatti a GitHub) ---
+*.safetensors
+*.safetensors.index.json
+*.parquet
+*.pt
+*.ckpt
+*.bin
+*.gguf
+*.onnx
+*.tar
+*.zip
+*.7z
+*.rar
+*.part
+
+# Dataset/raw grandi
+training/data/books_raw/
+training/data/corpus/
+training/books_full.jsonl
+*.rejected
+training/pretrain/artifacts/*.bin
+training/pretrain/outputs/
+training/outputs/
+
+# Log locali
+*.log

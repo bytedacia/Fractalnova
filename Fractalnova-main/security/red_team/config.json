@@ -1,0 +1,15 @@
+{
+  "test_target": "security/red_team/_test_target.py",
+  "payloads": [
+    {"id": "P001", "file": "payload_secrets.py", "type": "Secret Leakage", "critical": true},
+    {"id": "P002", "file": "payload_backdoor.py", "type": "Backdoor", "critical": true},
+    {"id": "P003", "file": "payload_reverse_shell.py", "type": "Reverse Shell", "critical": true},
+    {"id": "P004", "file": "payload_exfiltration.py", "type": "Data Exfiltration", "critical": true},
+    {"id": "P005", "file": "payload_miner.py", "type": "Cryptominer", "critical": true},
+    {"id": "P006", "file": "payload_obfuscated.py", "type": "Offuscamento", "critical": true},
+    {"id": "P007", "file": "payload_eval_exec.py", "type": "eval/exec", "critical": true},
+    {"id": "P008", "file": "payload_sensitive_path.py", "type": "Sensitive Path I/O", "critical": true},
+    {"id": "P009", "file": "payload_ultra_destructive.py", "type": "Ultra Destructive / Security Sabotage", "critical": true},
+    {"id": "P010", "file": "payload_evasion_bypass.py", "type": "Evasion Bypass (subprocess list / pathlib)", "critical": true}
+  ]
+}

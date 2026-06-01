@@ -1,0 +1,25 @@
+# =========================================================================
+# FractalNova · Pipeline Config · Qwen3-4B
+# =========================================================================
+
+base_model: "Qwen/Qwen3-4B"
+sft_config: "training/configs/qlora_5060ti.yaml"
+dpo_config: "training/configs/dpo_5060ti.yaml"
+optuna_config: "training/configs/qlora_5060ti.yaml"
+data_dir: "training/data"
+output_dir: "training/outputs"
+sft_adapter_dir: "training/outputs/fractalnova-qlora"
+dpo_adapter_dir: "training/outputs/fractalnova-dpo"
+merged_model_dir: "training/outputs/fractalnova-pro-merged"
+benchmark_report: "training/benchmark_report.json"
+
+# Dataset
+dataset_num_examples: 100000     # scala illimitato
+dataset_languages: "it,en,es,fr,de,pt"
+dpo_max_pairs: 2000
+n_hparam_trials: 30
+benchmark_models: "gemini-2.0-flash,fractalnova-pro,base-qwen"
+
+trust_remote_code: false
+auto_deploy: false
+deploy_command: "kubectl set image deployment/fractalnova-vllm fractalnova-pro=ghcr.io/fractalnova/fractalnova-pro:latest"
