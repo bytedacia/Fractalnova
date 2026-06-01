@@ -36,21 +36,35 @@ dalla scrittura del manoscritto ai file pronti per la pubblicazione (EPUB/PDF/Wo
 
 ---
 
-## 🧠 I modelli (strategia a tre tracce)
+## 🧠 I modelli (strategia a quattro tracce)
 
 | | Tipo | Parametri | Multilingua "umano" | Ruolo | Licenza |
 |---|---|---|---|---|---|
-| **FractalNova-Pro** | Modello proprietario **da zero** | **~321B** | ✅ ~29 lingue | Motore di punta | **Proprietario — non distribuibile** |
-| **FractalNova-Base** | Modello proprietario **da zero** | **~25B** | ✅ ~29 lingue | Motore di produzione | **Proprietario — non distribuibile** |
+| **FractalNova-Pro** | Pretraining **da zero** | **~321B** | ✅ ~29 lingue | Motore di punta | **Proprietario** |
+| **FractalNova-Base** | Pretraining **da zero** | **~25B** | ✅ ~29 lingue | Motore di produzione | **Proprietario** |
+| **FractalNova-Mini** | Pretraining **da zero** | **~8B** | ✅ ~29 lingue | Leggero, test-only, open source | **Apache-2.0** |
 | **FractalNova-Core** | Pretraining **da zero** | ~124M | ⚠️ 1–2 lingue | Nucleo proprietario / ricerca | **Proprietario** |
 
-> ⚠️ **Tutti i modelli FractalNova sono proprietari.** I pesi, l'architettura e il codice di addestramento
-> non sono distribuiti pubblicamente. L'accesso ai modelli FractalNova è soggetto a licenza proprietaria
-> (vedi [`LICENSE-MODEL`](LICENSE-MODEL)). Nessuna autorizzazione è concessa per la copia, la modifica,
-> la distribuzione o la creazione di opere derivate.
+> ⚠️ **Pro, Base e Core sono modelli proprietari.** I pesi non sono distribuiti pubblicamente.
+> L'accesso è soggetto a licenza proprietaria (vedi [`LICENSE-MODEL`](LICENSE-MODEL)).
 >
-> **FractalNova-Base (25B)** è la versione prioritaria per la produzione: bilancia potenza e
-> efficienza, ed è il modello di default per l'inferenza locale.
+> **FractalNova-Mini (8B)** è **open source** (Apache-2.0). Genera solo testo:
+> non include copertine, pubblicazione, SEO visiva né export. Peso leggero,
+> ideale per uso locale su GPU consumer.
+
+### FractalNova-Mini — cosa include e cosa NO
+
+| | Mini (8B) | Base/Pro |
+|---|---|---|
+| Generazione testo | ✅ | ✅ |
+| Umanizzazione | ✅ | ✅ |
+| Traduzione | ✅ | ✅ |
+| Analisi stile | ✅ | ✅ |
+| Copertine (FLUX) | ❌ | ✅ |
+| SEO visiva / visione | ❌ | ✅ |
+| Pubblicazione KDP | ❌ | ✅ |
+| Export EPUB/DOCX/PDF | ❌ | ✅ |
+| Open source | ✅ Apache-2.0 | ❌ Proprietario |
 
 Dettagli, comandi e note hardware: [`training/README.md`](training/README.md) · scheda: [`MODEL_CARD.md`](MODEL_CARD.md).
 
@@ -61,6 +75,7 @@ from inference.fractalnova import FractalNovaInference
 
 ai = FractalNovaInference("pro")    # FractalNova-Pro 321B — modello proprietario (no pesi pubblici)
 ai = FractalNovaInference("base")   # FractalNova-Base 25B — modello proprietario (default produzione)
+ai = FractalNovaInference("mini")   # FractalNova-Mini 8B — open source (Apache-2.0), solo testo
 ai = FractalNovaInference("core")   # 124M da zero (IP proprietario)
 
 ai.generate("Scrivi un racconto...")                       # testo
@@ -78,16 +93,15 @@ ai.run({"title":"...", "genre":"..."})                      # pipeline
 
 | Modulo | Descrizione | Modello |
 |---|---|---|
-| Testo / Chat | generazione, stile, SEO, traduzione | **FractalNova-Base 25B** (default) / **Pro 321B** (premium) |
-| Visione | analisi copertine, SEO visiva, genere | **Gemma-4-E2B** |
-| Copertina | generazione immagini | **FLUX.1-dev** |
-| Addestramento | QLoRA + DPO | `training/` |
+| Testo / Chat | generazione, stile, traduzione | **FractalNova-Mini 8B** (open source) / **Base 25B** (default) / **Pro 321B** (premium) |
+| Visione | analisi copertine, SEO visiva, genere | **Gemma-4-E2B** (solo Base/Pro) |
+| Copertina | generazione immagini | **FLUX.1-dev** (solo Base/Pro) |
+| Pubblicazione | EPUB, DOCX, PDF, Wattpad, KDP | `fractalnova/export.py` (solo Base/Pro) |
+| Addestramento | QLoRA + DPO + pretraining | `training/` |
 | Frontend | Gradio 4 tab (`app.py`) | testi, stile, libri, copertine |
-| Export | EPUB, DOCX, PDF, Wattpad, KDP | `fractalnova/export.py` |
 
-> **Onestà:** FractalNova-Base (25B) e FractalNova-Pro (321B) sono modelli **proprietari** non distribuiti pubblicamente.
-> L'intera pipeline è progettata per funzionare in locale con i modelli proprietari FractalNova,
-> senza dipendere da API esterne. FractalNova "compete" per **specializzazione** sul dominio libri.
+> **Onestà:** FractalNova-Mini (8B) è l'unico modello **open source** (Apache-20). Genera solo testo.
+> FractalNova-Base (25B) e Pro (321B) sono **proprietary** e includono l'intera pipeline completa.
 
 ---
 
@@ -156,13 +170,12 @@ Tabella estesa GPU/CPU/RAM: vedi sezione hardware in fondo a questo file nella s
 
 ## 📄 Licenza
 - **Codice**: [`LICENSE-CODE`](LICENSE-CODE) — licenza open source.
-- **Modelli / Pesi**: [`LICENSE-MODEL`](LICENSE-MODEL) — **proprietario, non distribuibile**.
-  FractalNova-Pro (321B), FractalNova-Base (25B) e FractalNova-Core (124M) sono modelli proprietari.
-  Nessuna autorizzazione è concessa per la copia, modifica, distribuzione o creazione di opere derivate.
+- **Modelli proprietari**: [`LICENSE-MODEL`](LICENSE-MODEL) — FractalNova-Pro (321B), FractalNova-Base (25B), FractalNova-Core (124M). **Non distribuibili.**
+- **FractalNova-Mini (8B)**: **Apache-2.0** — open source, pesi distribuiti pubblicamente.
 - Rispettare le licenze dei modelli di terze parti (es. FLUX.1-dev → Black Forest Labs).
 
-> ⚠️ **Attenzione**: i pesi dei modelli FractalNova non sono inclusi in questo repository e non sono
-> distribuiti. L'accesso è soggetto a separata licenza proprietaria.
+> ⚠️ I pesi di Pro, Base e Core non sono inclusi in questo repository e non sono distribuiti.
+> FractalNova-Mini (8B) è disponibile come modello open source su Hugging Face.
 
 ## 📝 Citazione
 Vedi [`CITATION.cff`](CITATION.cff).

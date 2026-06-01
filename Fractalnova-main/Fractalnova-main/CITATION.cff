@@ -2,9 +2,10 @@ cff-version: 1.2.0
 message: "Se usi FractalNova nel tuo lavoro, cita come segue."
 title: "FractalNova — sistema multilingua per generazione e pubblicazione di libri con IA"
 abstract: >-
-  Famiglia di modelli proprietari per la generazione e pubblicazione di libri con IA:
-  FractalNova-Pro (~321B), FractalNova-Base (~25B, default produzione) e
-  FractalNova-Core (~124M, ricerca). Tutti i modelli sono proprietari e non distribuiti.
+  Famiglia di modelli per la generazione e pubblicazione di libri con IA:
+  FractalNova-Pro (~321B, proprietario), FractalNova-Base (~25B, proprietario),
+  FractalNova-Mini (~8B, open source Apache-2.0, solo testo) e
+  FractalNova-Core (~124M, proprietario, ricerca).
 type: software
 version: "0.1.0"
 date-released: "2026-05-31"
